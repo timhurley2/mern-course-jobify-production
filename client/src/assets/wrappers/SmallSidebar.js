@@ -32,8 +32,8 @@ const Wrapper = styled.aside`
   }
   .close-btn {
     position: absolute;
-    top: 25px;
-    left: 10px;
+    top: 40px;
+    left: 5px;
     background: transparent;
     border-color: transparent;
     font-size: 2rem;
