@@ -32,7 +32,7 @@ const Wrapper = styled.aside`
   }
   .close-btn {
     position: absolute;
-    top: 10px;
+    top: 25px;
     left: 10px;
     background: transparent;
     border-color: transparent;
