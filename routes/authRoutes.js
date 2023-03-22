@@ -6,6 +6,7 @@ import {
   updateUser,
   getCurrentUser,
   logout,
+  validateEmail,
 } from "../controllers/authController.js";
 import authenticateUser from "../middleware/auth.js";
 import rateLimiter from "express-rate-limit";
@@ -21,4 +22,6 @@ router.route("/login").post(apiLimiter, login);
 router.route("/updateUser").patch(authenticateUser, testUser, updateUser);
 router.route("/getCurrentUser").get(authenticateUser, getCurrentUser);
 router.route("/logout").get(logout);
+router.route("/validateEmail").post(validateEmail);
 export default router;
+

@@ -32,6 +32,9 @@ import {
   DELETE_JOB_ERROR,
   GET_CURRENT_USER_BEGIN,
   GET_CURRENT_USER_SUCCESS,
+  VALIDATE_EMAIL_BEGIN,
+  VALIDATE_EMAIL_SUCCESS,
+  VALIDATE_EMAIL_ERROR,
 } from "./actions";
 
 const initialState = {
@@ -91,10 +94,13 @@ const AppProvider = ({ children }) => {
     dispatch({ type: DISPLAY_ALERT });
     clearAlert();
   };
-  const clearAlert = () => {
+  const clearAlert = (ticks) => {
+    if(!ticks){
+      ticks = 3000
+    }
     setTimeout(() => {
       dispatch({ type: CLEAR_ALERT });
-    }, 3000);
+    }, ticks);
   };
 
   const setupUser = async ({ currentUser, endPoint, alertText }) => {
@@ -115,7 +121,7 @@ const AppProvider = ({ children }) => {
         payload: { msg: error.response.data.msg },
       });
     }
-    clearAlert();
+    clearAlert(10000)
   };
 
   const toggleSidebar = () => {
@@ -287,6 +293,18 @@ const AppProvider = ({ children }) => {
       logoutUser();
     }
   };
+  const validateEmail = async (code) => {
+    dispatch({type: VALIDATE_EMAIL_BEGIN});
+    try{
+      await authFetch.post("/auth/validateEmail", {code});
+      dispatch({type: VALIDATE_EMAIL_SUCCESS});
+    } catch(error){
+      console.log(error);
+      dispatch({type:VALIDATE_EMAIL_ERROR, payload: {msg: error.response.data.msg}});
+      console.log(state);
+    }
+    clearAlert(5000)
+  }
   useEffect(() => {
     getCurrentUser();
     // eslint-disable-next-line
@@ -310,6 +328,7 @@ const AppProvider = ({ children }) => {
         showStats,
         clearFilters,
         changePage,
+        validateEmail,
       }}
     >
       {children}

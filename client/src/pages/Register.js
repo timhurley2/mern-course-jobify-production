@@ -43,7 +43,7 @@ const Register = () => {
       setupUser({
         currentUser,
         endPoint: "register",
-        alertText: "User Created! Redirecting...",
+        alertText: "User Created! Please check your email for a link to verify your email address!",
       });
     }
     // console.log(values);
@@ -52,9 +52,14 @@ const Register = () => {
   
   useEffect(() => {
     if (user) {
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
+      if(user.verified){
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
+      } else{
+
+      }
+      
     }
   }, [user, navigate]);
 

@@ -3,7 +3,8 @@ import ConfirmCode from "../models/ConfirmCode.js";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, UnAuthenticatedError } from "../errors/index.js";
 import attachCookie from "../utils/attachCookie.js";
-import nodeMailer from 'nodemailer';
+import sendVerifyEmail from "../utils/sendEmail.js";
+
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -16,7 +17,16 @@ const register = async (req, res) => {
   }
   const user = await User.create({ name, email, password });
   const confirmCode = await ConfirmCode.create({userId: user._id});
-  res.status(StatusCodes.CREATED).json({code: confirmCode.code});
+  const url = `http://localhost:3000/confirmemail/${confirmCode.code}`;
+
+  sendVerifyEmail(user.email, url);
+  res.status(StatusCodes.CREATED).json({user: {
+        email: user.email,
+        lastName: user.lastName,
+        location: user.location,
+        name: user.name,
+        verified: user.verified,
+      }});
   // const token = user.createJWT();
   // attachCookie({res, token});
   // res.status(StatusCodes.CREATED).json({
@@ -30,6 +40,29 @@ const register = async (req, res) => {
   // });
 
 };
+
+const validateEmail = async(req, res) => {
+  const {code} = req.body;
+  if(!code){
+    throw new BadRequestError('Please click on link from email.');
+  }
+  const confirmCode = await ConfirmCode.findOne({code: code});
+  if(! confirmCode){
+    throw new BadRequestError('User not found.  Try logging in, or creating account.  Redirecting...');
+  }
+  const timeSinceCreation = Date.now() - confirmCode.createdAt;
+  var limit = 1000 * 60 * 60 * 6;
+  if(timeSinceCreation > limit){
+    await User.deleteOne({_id: confirmCode.userId});
+    await ConfirmCode.deleteOne(confirmCode);
+    throw new BadRequestError('Too much time has elapsed since account creation.  Please recreate account.  Redirecting...');
+  }
+  await User.findOneAndUpdate({_id: confirmCode.userId}, {verified: true});
+  await ConfirmCode.findOneAndUpdate({_id: confirmCode._id}, {code: ''
+  });
+  res.status(StatusCodes.OK).json({msg: 'Successfully validated user.  Redirecting...'});
+}
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -43,6 +76,9 @@ const login = async (req, res) => {
   const isPasswordCorrect = await user.comparePassword(password);
   if (!isPasswordCorrect) {
     throw new UnAuthenticatedError("Invalid Credentials");
+  }
+  if(!user.verified){
+    throw new BadRequestError('The email address has not been verified.  Please check email for verification email and click on link');
   }
   const token = user.createJWT();
 
@@ -82,4 +118,4 @@ const logout = async (req, res) => {
   res.status(StatusCodes.OK).json({msg: 'User logged out!'});
 }
 
-export { register, login, updateUser, getCurrentUser,logout };
+export { register, login, updateUser, getCurrentUser,logout, validateEmail };

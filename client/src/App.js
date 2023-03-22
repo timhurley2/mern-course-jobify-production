@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { Landing, Error, Register, ProtectedRoute } from "./pages";
+import { Landing, Error, Register, ProtectedRoute, ValidateEmail } from "./pages";
 import {
   AllJobs,
   AddJob,
@@ -27,6 +27,8 @@ function App() {
           </Route>
           <Route path="/register" element={<Register />} />
           <Route path="/landing" element={<Landing />} />
+          <Route path="/confirmemail" element={<ValidateEmail />} />
+          <Route path="/confirmemail/:code" element={<ValidateEmail />} />
           <Route path="*" element={<Error />} />
         </Routes>
       </BrowserRouter>

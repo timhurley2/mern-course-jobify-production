@@ -28,11 +28,15 @@ import {
   DELETE_JOB_ERROR,
   GET_CURRENT_USER_BEGIN,
   GET_CURRENT_USER_SUCCESS,
+  VALIDATE_EMAIL_BEGIN,
+  VALIDATE_EMAIL_SUCCESS,
+  VALIDATE_EMAIL_ERROR,
 } from "./actions";
 
 import { initialState } from "./appContext";
 
 const reducer = (state, action) => {
+  console.log(action.type);
   if (action.type === DISPLAY_ALERT) {
     return {
       ...state,
@@ -82,9 +86,32 @@ const reducer = (state, action) => {
 
   if (action.type === LOGOUT_USER) {
     return {
-      ...initialState,
-      userLoading: false
-
+      ...state,
+      isLoading: false,
+      userLoading: false,user: null,
+      userLocation: "",
+      jobLocation: "",
+      showSidebar: false,
+      isEditing: false,
+      editJobId: "",
+      position: "",
+      company: "",
+      jobTypeOptions: ["full-time", "part-time", "remote", "internship"],
+      jobType: "full-time",
+      statusOptions: ["interview", "declined", "pending"],
+      status: "pending",
+      jobs: [],
+      totalJobs: 0,
+      numOfPages: 1,
+      page: 1,
+      stats: {},
+      monthlyApplications: [],
+      search: "",
+      searchStatus: "all",
+      searchType: "all",
+      sort: "latest",
+      sortOptions: ["latest", "oldest", "a-z", "z-a"],
+      limit: 10,
     };
   }
 
@@ -259,11 +286,38 @@ const reducer = (state, action) => {
       page: action.payload.page,
     };
   }
-  if(action.type === GET_CURRENT_USER_BEGIN){
-    return {...state, userLoading: true, showAlert: false,}
+  if (action.type === GET_CURRENT_USER_BEGIN) {
+    return { ...state, userLoading: true, showAlert: false };
   }
-  if(action.type === GET_CURRENT_USER_SUCCESS){
-    return {...state, userLoading: false,user:action.payload.user, userLoaction: action.payload.location, jobLocation: action.payload.location}
+  if (action.type === GET_CURRENT_USER_SUCCESS) {
+    return {
+      ...state,
+      userLoading: false,
+      user: action.payload.user,
+      userLoaction: action.payload.location,
+      jobLocation: action.payload.location,
+    };
+  }
+  if (action.type === VALIDATE_EMAIL_BEGIN) {
+    return { ...state, isLoading: true };
+  }
+  if (action.type === VALIDATE_EMAIL_SUCCESS) {
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertType: "success",
+      alertText: "Successfully Verified Email. Redirecting...",
+    };
+  }
+  if (action.type === VALIDATE_EMAIL_ERROR) {
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertType: "danger",
+      alertText: action.payload.msg,
+    };
   }
   throw new Error(`no such action : ${action.type}`);
 };

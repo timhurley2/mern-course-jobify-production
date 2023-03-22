@@ -1,7 +1,7 @@
 import nodeMailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
-const sendEmail = () => {
+const sendVerifyEmail = (toAddress, url) => {
     const transporter = nodeMailer.createTransport({
         service: 'gmail',
         auth: {
@@ -11,18 +11,17 @@ const sendEmail = () => {
       });
       const mailOptions = {
         from: 'thurle223341@gmail.com',
-        to: 'thurle223341@gmail.com',
+        to: toAddress,
         subject: 'Subject',
-        text: 'Testing 123'
+        html: `<p>Thank you for registering for Jobify!!  Please <a href='${url}'>Click Here</a> to confirm your email address`,
       };
       transporter.sendMail(mailOptions, (error, info) => {
         if(error){
           console.log(error);
-          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({error})
         } else{
           console.log('Email sent: ' + info.response);
-          res.status(StatusCodes.OK).json({msg: 'Successfully sent email'});
         }
-    
       });
 }
+
+export default sendVerifyEmail;
