@@ -3,21 +3,20 @@ import { FaAlignLeft, FaUserCircle, FaCaretDown } from "react-icons/fa";
 import { useAppContext } from "../context/appContext";
 import Logo from "./Logo";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 const NavBar = () => {
   const [showLogout, setShowLogout] = useState(false);
-  const {toggleSidebar, logoutUser, user} = useAppContext()
-    return (
+  const { toggleSidebar, logoutUser, user } = useAppContext();
+  return (
     <Wrapper>
       <div className="nav-center">
-        <button
-          className="toggle-btn"
-          type="button"
-          onClick={toggleSidebar}
-        >
+        <button className="toggle-btn" type="button" onClick={toggleSidebar}>
           <FaAlignLeft />
         </button>
         <div>
-          <Logo />
+          <Link to="/">
+            <Logo />
+          </Link>
           <h3 className="logo-text">Dashboard</h3>
         </div>
         <div className="btn-container">
@@ -33,11 +32,7 @@ const NavBar = () => {
             <FaCaretDown />
           </button>
           <div className={showLogout ? "dropdown show-dropdown" : "dropdown"}>
-            <button
-              type="button"
-              className="dropdown-btn"
-              onClick={logoutUser}
-            >
+            <button type="button" className="dropdown-btn" onClick={logoutUser}>
               Logout
             </button>
           </div>
