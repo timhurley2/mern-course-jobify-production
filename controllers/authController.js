@@ -1,7 +1,9 @@
 import User from "../models/User.js";
+import ConfirmCode from "../models/ConfirmCode.js";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, UnAuthenticatedError } from "../errors/index.js";
 import attachCookie from "../utils/attachCookie.js";
+import nodeMailer from 'nodemailer';
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -13,17 +15,20 @@ const register = async (req, res) => {
     throw new BadRequestError("Email already in use");
   }
   const user = await User.create({ name, email, password });
-  const token = user.createJWT();
-  attachCookie({res, token});
-  res.status(StatusCodes.CREATED).json({
-    user: {
-      email: user.email,
-      lastName: user.lastName,
-      location: user.location,
-      name: user.name,
-    },
-    location: user.location,
-  });
+  const confirmCode = await ConfirmCode.create({userId: user._id});
+  res.status(StatusCodes.CREATED).json({code: confirmCode.code});
+  // const token = user.createJWT();
+  // attachCookie({res, token});
+  // res.status(StatusCodes.CREATED).json({
+  //   user: {
+  //     email: user.email,
+  //     lastName: user.lastName,
+  //     location: user.location,
+  //     name: user.name,
+  //   },
+  //   location: user.location,
+  // });
+
 };
 const login = async (req, res) => {
   const { email, password } = req.body;
